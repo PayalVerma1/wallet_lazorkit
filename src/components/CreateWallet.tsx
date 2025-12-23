@@ -1,6 +1,6 @@
 "use client";
 
-// ConnectButton.tsx
+// ConnectButton
 import { useWallet } from '@lazorkit/wallet';
 
 export function ConnectButton() {
@@ -21,8 +21,10 @@ export function ConnectButton() {
   }
 
   return (
-    <button onClick={() => connect()} disabled={isConnecting}>
+    <div className='flex flex-col items-center justify-center border h-20 w-60 py-2 rounded-md '>
+    <button onClick={() => connect()} disabled={isConnecting} className='border px-6 h-20 w-60 py-2 rounded-md bg-black'>
       {isConnecting ? 'Connecting...' : 'Connect with Passkey'}
     </button>
+    </div>
   );
 }

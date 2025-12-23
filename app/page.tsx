@@ -8,10 +8,10 @@ export function MainContent() {
   const { isConnected, smartWalletPubkey } = useWallet();
 
   return (
-    <div style={{ padding: 32 }}>
-      <h1>Lazorkit Solana Demo</h1>
-
-      <ConnectButton />
+    <div className="flex flex-col items-center justify-center h-screen p-8 border">
+      <h1 className="text-4xl mb-4 font-bold p-4 mask-radial-from-neutral-900">Lazorkit Solana Demo</h1>
+      <div className='mb-4'> <ConnectButton /></div>
+     
 
       {isConnected && smartWalletPubkey && (
         <>
