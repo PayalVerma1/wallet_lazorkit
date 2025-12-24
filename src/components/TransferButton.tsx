@@ -1,6 +1,6 @@
 "use client";
 
-// TransferButton.tsx
+// TransferButton
 import { useWallet } from '@lazorkit/wallet';
 import { SystemProgram, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 

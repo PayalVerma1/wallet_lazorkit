@@ -1,32 +1,29 @@
 "use client";
 
-import { ConnectButton } from '../src/components/CreateWallet';
-import { TransferButton } from '../src/components/TransferButton';
-import { useWallet } from '@lazorkit/wallet';
+import Link from "next/link";
 
-export function MainContent() {
-  const { isConnected, smartWalletPubkey } = useWallet();
-
+export default function HomePage() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen p-8 border">
-      <h1 className="text-4xl mb-4 font-bold p-4 mask-radial-from-neutral-900">Lazorkit Solana Demo</h1>
-      <div className='mb-4'> <ConnectButton /></div>
-     
+    <div className="flex flex-col items-center justify-center h-screen gap-6">
+      <h1 className="text-4xl font-bold">Lazorkit Integration Examples</h1>
 
-      {isConnected && smartWalletPubkey && (
-        <>
-          <p>
-            Smart Wallet:
-            <br />
-            <code>{smartWalletPubkey.toBase58()}</code>
-          </p>
+      <Link href="/example-01-login">
+        <button className="border px-6 py-3 rounded">
+          Example 01: Passkey Login + Smart Wallet
+        </button>
+      </Link>
 
-          <TransferButton />
-        </>
-      )}
+      <Link href="/example-02-transfer">
+        <button className="border px-6 py-3 rounded">
+          Example 02: Gasless SOL Transfer
+        </button>
+      </Link>
+
+      <Link href="/example-03-pay-widget">
+        <button className="border px-6 py-3 rounded">
+          Example 03: Pay with Solana Widget
+        </button>
+      </Link>
     </div>
   );
 }
-
-// Next expects a default export for a page
-export default MainContent;
