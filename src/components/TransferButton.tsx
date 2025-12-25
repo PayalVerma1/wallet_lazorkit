@@ -43,8 +43,20 @@ export function TransferButton() {
   };
 
   return (
-    <button onClick={handleTransfer} disabled={!isConnected}>
-      Send 0.1 SOL (Gasless)
-    </button>
+  <button
+  onClick={handleTransfer}
+  disabled={!isConnected}
+  className="
+    px-6 py-3 rounded-lg
+    border border-orange-400
+    text-orange-400 font-medium
+    transition
+    hover:bg-orange-400 hover:text-black
+    disabled:opacity-40 disabled:cursor-not-allowed
+    disabled:hover:bg-transparent disabled:hover:text-orange-400
+  "
+>
+  Send 0.1 SOL (Gasless)
+</button>
   );
 }

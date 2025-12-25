@@ -191,8 +191,3 @@ The focus is on:
 - Developer experience
 
 Feel free to fork, extend, or adapt these examples for your own projects.
-
-```
-
----
-```

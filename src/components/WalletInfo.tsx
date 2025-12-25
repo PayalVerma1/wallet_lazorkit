@@ -8,7 +8,7 @@ export function WalletInfo() {
   if (!isConnected || !smartWalletPubkey) return null;
 
   return (
-    <p className="text-sm text-gray-600">
+    <p className="text-sm text-orange-100">
       Smart Wallet Address:
       <br />
       {smartWalletPubkey.toBase58()}
