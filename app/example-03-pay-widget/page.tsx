@@ -1,7 +1,7 @@
 "use client";
 
-import { ConnectButton } from "@/src/components/CreateWallet";
-import { PayWithSolanaButton } from "@/src/components/DonationButton";
+import { ConnectButton } from "@/src/components/ConnectButton";
+import { PayWithSolanaButton } from "@/src/components/PayWithSolanaButton";
 import { useWallet } from "@lazorkit/wallet";
 
 export default function PayWidgetExample() {

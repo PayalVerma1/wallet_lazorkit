@@ -1,6 +1,6 @@
 "use client";
 
-import { ConnectButton } from "@/src/components/CreateWallet";
+import { ConnectButton } from "@/src/components/ConnectButton";
 import { TransferButton } from "@/src/components/TransferButton";
 import { useWallet } from "@lazorkit/wallet";
 

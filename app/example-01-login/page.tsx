@@ -1,6 +1,6 @@
 "use client";
 
-import { ConnectButton } from "@/src/components/CreateWallet";
+import { ConnectButton } from "@/src/components/ConnectButton";
 import { WalletInfo } from "@/src/components/WalletInfo";
 
 export default function LoginExample() {

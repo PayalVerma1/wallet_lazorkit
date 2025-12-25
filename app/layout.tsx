@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { LazorkitAppProvider } from "../src/lib/lazorkit";
+import { LazorkitAppProvider } from "../src/providers/lazorkit";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
