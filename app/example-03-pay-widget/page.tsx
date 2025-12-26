@@ -78,7 +78,7 @@ export default function PayWidgetExample() {
             by Solana smart wallets.
           </p>
 
-          <div className="border border-white/15 rounded-lg overflow-hidden">
+          <div className="border border-[#2dd4bf] rounded-lg overflow-hidden">
             <CodeBlock code={TRANSFER_CODE} />
           </div>
         </>

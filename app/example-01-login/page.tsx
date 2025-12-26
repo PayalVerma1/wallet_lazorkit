@@ -69,7 +69,7 @@ export default function Example01Login() {
             access the full smart wallet functionality.
           </p>
 
-          <div className="border border-white/15 rounded-lg overflow-hidden">
+          <div className="border border-[#2dd4bf] rounded-lg overflow-hidden">
            <CodeBlock code={LOGIN_CODE} />
 
           </div>

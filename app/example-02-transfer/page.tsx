@@ -81,7 +81,7 @@ export default function TransferExample() {
             a transaction with fees sponsored by a paymaster.
           </p>
 
-          <div className="border border-white/15 rounded-lg overflow-hidden">
+          <div className="border border-[#2dd4bf] rounded-lg overflow-hidden">
            <CodeBlock code={TRANSFER_CODE} />
           </div>
         </>
