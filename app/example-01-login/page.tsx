@@ -4,6 +4,33 @@ import Image from "next/image";
 import { ExampleLayout } from "@/src/components/ExampleLayout";
 import { ConnectButton } from "@/src/components/ConnectButton";
 import { WalletInfo } from "@/src/components/WalletInfo";
+import { CodeBlock } from "@/src/components/CodeBlock";
+
+const LOGIN_CODE = `import { useWallet } from "@lazorkit/wallet";
+
+export function ConnectButton() {
+  const {
+    connect,
+    disconnect,
+    isConnected,
+    isConnecting,
+    smartWalletPubkey,
+  } = useWallet();
+
+  if (isConnected && smartWalletPubkey) {
+    return (
+      <button onClick={disconnect}>
+        Disconnect ({smartWalletPubkey.toBase58().slice(0, 6)}...)
+      </button>
+    );
+  }
+
+  return (
+    <button onClick={() => connect()} disabled={isConnecting}>
+      {isConnecting ? "Connecting..." : "Connect with Passkey"}
+    </button>
+  );
+}`;
 
 export default function Example01Login() {
   return (
@@ -43,13 +70,8 @@ export default function Example01Login() {
           </p>
 
           <div className="border border-white/15 rounded-lg overflow-hidden">
-            <Image
-              src="/Images/image.png"
-              alt="Lazorkit passkey login screenshot"
-              width={900}
-              height={450}
-              className="w-full h-auto"
-            />
+           <CodeBlock code={LOGIN_CODE} />
+
           </div>
         </>
       }

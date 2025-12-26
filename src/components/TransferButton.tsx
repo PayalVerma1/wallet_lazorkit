@@ -1,62 +1,70 @@
 "use client";
 
-// TransferButton
-import { useWallet } from '@lazorkit/wallet';
-import { SystemProgram, PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { useWallet } from "@lazorkit/wallet";
+import {
+  getAssociatedTokenAddress,
+  createTransferInstruction,
+} from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
+
+const USDC_MINT = new PublicKey(
+  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+);
+
+const RECIPIENT = new PublicKey(
+  "EEE2dZ4EHFHmgG24zKgVUutCXQqtYTLJCEAWoNcNAXTj"
+);
 
 export function TransferButton() {
-  const { signAndSendTransaction, smartWalletPubkey, isConnected } = useWallet();
+  const { smartWalletPubkey, signAndSendTransaction } = useWallet();
 
   const handleTransfer = async () => {
     if (!smartWalletPubkey) return;
 
-    try {
-      // Use integer math
-      const lamports = Math.floor(0.1 * LAMPORTS_PER_SOL);
+    // 1 USDC = 1_000_000 (6 decimals)
+    const amount = 1_000_000;
 
-      const destination = new PublicKey(
-        'EEE2dZ4EHFHmgG24zKgVUutCXQqtYTLJCEAWoNcNAXTj' // devnet address
-      );
+    // Sender USDC ATA
+    const fromTokenAccount = await getAssociatedTokenAddress(
+      USDC_MINT,
+      smartWalletPubkey
+    );
 
-      // Create instruction
-      const instruction = SystemProgram.transfer({
-        fromPubkey: smartWalletPubkey,
-        toPubkey: destination,
-        lamports
-      });
+    // Recipient USDC ATA
+    const toTokenAccount = await getAssociatedTokenAddress(
+      USDC_MINT,
+      RECIPIENT
+    );
 
-      // Sign & send (gasless)
-      const signature = await signAndSendTransaction({
-        instructions: [instruction],
-        transactionOptions: {
-          feeToken: 'USDC' // Pay in USDC
-        }
-      });
+    // Create USDC transfer instruction
+    const instruction = createTransferInstruction(
+      fromTokenAccount,
+      toTokenAccount,
+      smartWalletPubkey,
+      amount
+    );
 
-      console.log('Transaction confirmed:', signature);
-      alert(`Tx sent!\n${signature}`);
-      
-    } catch (err) {
-      console.error('Transfer failed:', err);
-      alert('Transfer failed. Check console.');
-    }
+    // Gasless send
+    await signAndSendTransaction({
+      instructions: [instruction],
+      transactionOptions: {
+        feeToken: "USDC", // pay gas in USDC
+      },
+    });
+
+    alert("USDC transfer successful!");
   };
 
   return (
-  <button
-  onClick={handleTransfer}
-  disabled={!isConnected}
-  className="
-    px-6 py-3 rounded-lg
+    <button onClick={handleTransfer} className="px-6 py-3 rounded-lg
     border border-orange-400
     text-orange-400 font-medium
     transition
     hover:bg-orange-400 hover:text-black
     disabled:opacity-40 disabled:cursor-not-allowed
     disabled:hover:bg-transparent disabled:hover:text-orange-400
-  "
->
-  Send 0.1 SOL (Gasless)
-</button>
+  ">
+      Send 1 USDC (Gasless)
+    </button>
   );
 }

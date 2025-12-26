@@ -1,12 +1,44 @@
 "use client";
 
 import Image from "next/image";
+import {CodeBlock} from "@/src/components/CodeBlock";
 import { ExampleLayout } from "@/src/components/ExampleLayout";
 import { ConnectButton } from "@/src/components/ConnectButton";
 import { TransferButton } from "@/src/components/TransferButton";
 import { WalletInfo } from "@/src/components/WalletInfo";
 import { useWallet } from "@lazorkit/wallet";
+const TRANSFER_CODE = `import { useWallet } from "@lazorkit/wallet";
+import { createTransferInstruction, getAssociatedTokenAddress } from "@solana/spl-token";
+import { PublicKey } from "@solana/web3.js";
 
+const USDC_MINT = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
+const RECIPIENT = new PublicKey("EEE2dZ4EHFHmgG24zKgVUutCXQqtYTLJCEAWoNcNAXTj");
+
+export function GaslessUSDCTransfer() {
+  const { smartWalletPubkey, signAndSendTransaction } = useWallet();
+
+  async function sendUSDC() {
+    if (!smartWalletPubkey) return;
+
+    const from = await getAssociatedTokenAddress(USDC_MINT, smartWalletPubkey);
+    const to = await getAssociatedTokenAddress(USDC_MINT, RECIPIENT);
+
+    const ix = createTransferInstruction(
+      from,
+      to,
+      smartWalletPubkey,
+      1_000_000 // 1 USDC
+    );
+
+    await signAndSendTransaction({
+      instructions: [ix],
+      transactionOptions: { feeToken: "USDC" },
+    });
+  }
+
+  return <button onClick={sendUSDC}>Send 1 USDC (Gasless)</button>;
+}
+`;
 export default function TransferExample() {
   const { isConnected } = useWallet();
 
@@ -50,13 +82,7 @@ export default function TransferExample() {
           </p>
 
           <div className="border border-white/15 rounded-lg overflow-hidden">
-            <Image
-              src="/code-examples/gasless-transfer.png"
-              alt="Minimal Lazorkit gasless SOL transfer example"
-              width={900}
-              height={450}
-              className="w-full h-auto"
-            />
+           <CodeBlock code={TRANSFER_CODE} />
           </div>
         </>
       }

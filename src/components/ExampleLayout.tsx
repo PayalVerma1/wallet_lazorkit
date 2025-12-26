@@ -48,8 +48,6 @@ export function ExampleLayout({
               ))}
             </ul>
           </div>
-
-          {/* Try It Yourself */}
           <div className="rounded-xl border border-white/15 p-6 flex items-center justify-center">
             {children}
           </div>

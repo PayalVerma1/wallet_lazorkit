@@ -1,25 +1,26 @@
-# Example 02: Gasless SOL Transfer on Solana
+## Example 02: **Gasless USDC Transfer on Solana**
 
-This example demonstrates how to send SOL on Solana using a **smart wallet**
-without requiring the user to hold SOL for gas fees.
+This example demonstrates how to transfer **USDC (SPL token)** on Solana using a **passkey-based smart wallet**, without requiring the user to hold **SOL** for gas fees.
 
-It builds on the passkey login flow from Example 01.
+Transaction fees are sponsored via the **Lazorkit paymaster**, making the transfer **gasless** from the user’s perspective.
+
+This example builds on the **passkey login flow** from Example 01.
 
 ---
 
 ## What this example demonstrates
 
-- Interaction with an existing Solana protocol
-- Usage of `SystemProgram.transfer`
-- Gasless transactions using Lazorkit paymaster
-- Transaction signing via passkey-authenticated smart wallet
+* **USDC token transfer** on Solana
+* Interaction with the **SPL Token Program**
+* **Gasless transactions** using Lazorkit paymaster
+* Transaction signing via **passkey-authenticated smart wallet**
+* Web2-style user experience for on-chain payments
 
 ---
 
 ## Solana protocol used
 
-This example interacts with the **Solana System Program**, which is the core
-protocol responsible for native SOL transfers.
+This example interacts with the **SPL Token Program**, which is the standard Solana protocol used for transferring fungible tokens such as **USDC**.
 
 This satisfies the bounty requirement:
 
@@ -29,22 +30,26 @@ This satisfies the bounty requirement:
 
 ## User flow
 
-1. User logs in using passkey (Example 01)
-2. User clicks **“Send 0.1 SOL (Gasless)”**
-3. Lazorkit signs the transaction using the smart wallet
-4. Gas fees are paid via the paymaster
-5. Transaction is submitted to Solana Devnet
+1. User logs in using **passkey authentication**
+2. User clicks **Send 1 USDC (Gasless)**
+3. The app creates an **SPL token transfer instruction**
+4. Lazorkit signs the transaction using the **smart wallet**
+5. Gas fees are sponsored by the **paymaster**
+6. **USDC is transferred on-chain**
 
 ---
 
-## Why this is gasless
+## Why this transfer is gasless
 
-Normally, Solana users must hold SOL to pay transaction fees.
+On Solana, users normally need **SOL** to pay transaction fees.
 
-With Lazorkit:
-- A paymaster sponsors the transaction fees
-- Users can transact without holding SOL
-- UX is closer to traditional Web2 payments
+With **Lazorkit**:
+
+* Transaction fees are paid by a **paymaster**
+* Users do **not** need SOL
+* Only a **USDC balance** is required
+
+This removes gas friction while keeping transactions **non-custodial**.
 
 ---
 
@@ -52,26 +57,34 @@ With Lazorkit:
 
 This example shows how developers can:
 
-- Remove gas complexity from user experience
-- Interact with real Solana programs
-- Keep transactions fully on-chain and non-custodial
+* Transfer **real tokens (USDC)** instead of SOL
+* Remove gas complexity from user onboarding
+* Build **payment and checkout flows**
+* Keep transactions **fully on-chain**
 
-It demonstrates a core Lazorkit value proposition:
-**abstracting blockchain friction while preserving security**.
+This demonstrates Lazorkit’s core value:
+
+**Abstracting blockchain friction while preserving security**
 
 ---
 
 ## Key files
 
-- `TransferButton.tsx` – Creates and sends the SOL transfer instruction
-- Uses `@solana/web3.js` System Program
-- Uses Lazorkit `signAndSendTransaction`
+* **TransferButton.tsx**
+  Creates and sends the **USDC transfer instruction**
+
+* Uses:
+
+  * **@solana/spl-token** (SPL Token Program)
+  * Lazorkit **signAndSendTransaction**
+  * Paymaster via **feeToken: "USDC"**
 
 ---
 
-## Next steps
+## Notes
 
-Once developers understand gasless transfers, they can build real products
-on top of this pattern.
+* Sender must already hold **USDC**
+* Recipient must have an **associated USDC token account**
+* Works on **Devnet and Mainnet** (RPC and paymaster config change only)
 
-See **Example 03** for a product-style payment abstraction.
+---

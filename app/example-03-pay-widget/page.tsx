@@ -1,11 +1,40 @@
 "use client";
 
 import Image from "next/image";
+import {CodeBlock} from "@/src/components/CodeBlock";
 import { ExampleLayout } from "@/src/components/ExampleLayout";
 import { ConnectButton } from "@/src/components/ConnectButton";
 import { PayWithSolanaButton } from "@/src/components/PayWithSolanaButton";
 import { WalletInfo } from "@/src/components/WalletInfo";
 import { useWallet } from "@lazorkit/wallet";
+const TRANSFER_CODE = `import { useWallet } from "@lazorkit/wallet";
+import { SystemProgram, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+
+export function PayWithSolanaButton() {
+  const { signAndSendTransaction, smartWalletPubkey } = useWallet();
+
+  const handlePay = async () => {
+    if (!smartWalletPubkey) return;
+
+    const instruction = SystemProgram.transfer({
+      fromPubkey: smartWalletPubkey,
+      toPubkey: new PublicKey(""),
+      lamports: Math.floor(0.05 * LAMPORTS_PER_SOL),
+    });
+
+    await signAndSendTransaction({
+      instructions: [instruction],
+      transactionOptions: {
+        feeToken: "USDC",
+      },
+    });
+
+    alert("Payment successful!");
+  };
+
+  return <button onClick={handlePay}>Pay ₹99 with Solana</button>;
+}
+`;
 
 export default function PayWidgetExample() {
   const { isConnected } = useWallet();
@@ -50,13 +79,7 @@ export default function PayWidgetExample() {
           </p>
 
           <div className="border border-white/15 rounded-lg overflow-hidden">
-            <Image
-              src="/code-examples/pay-widget.png"
-              alt="Minimal Lazorkit Pay with Solana widget example"
-              width={900}
-              height={450}
-              className="w-full h-auto"
-            />
+            <CodeBlock code={TRANSFER_CODE} />
           </div>
         </>
       }
