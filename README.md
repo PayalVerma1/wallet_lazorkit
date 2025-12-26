@@ -61,7 +61,9 @@ Each example:
 ## Example 01: Passkey Login Flow with Smart Wallet
 
 **Path:** `app/example-01-login`
-**Tutorial** `app/example-01-login/README.md`
+
+**[Example 01: Passkey Login Flow](app/example-01-login/README.md)**
+
 
 This example demonstrates:
 
@@ -80,7 +82,8 @@ This example focuses purely on **authentication and wallet creation**, without t
 ## Example 02: Gasless USDC Transfer on Solana
 
 **Path:** `app/example-02-transfer`
-**Tutorial** `app/example-02-transfer/README.md`
+**[Example 02: Gasless USDC transfer](app/example-02-transfer/README.md)**
+
 
 This example demonstrates:
 
@@ -99,7 +102,8 @@ The transfer uses the **SPL Token Program**, which is the standard Solana protoc
 ## Example 03: Pay with Solana Widget
 
 **Path:** `app/example-03-pay-widget`
-**Tutorial** `app/example-03-pay-widget/README.md`
+**[Example 03: Pay Widget](app/example-02-pay-widget/README.md)**
+
 
 This example demonstrates:
 

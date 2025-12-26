@@ -4,6 +4,7 @@ import { useWallet } from "@lazorkit/wallet";
 import {
   getAssociatedTokenAddress,
   createTransferInstruction,
+  getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 
@@ -25,9 +26,10 @@ export function TransferButton() {
     const amount = 1_000_000;
 
     // Sender USDC ATA
-    const fromTokenAccount = await getAssociatedTokenAddress(
+    const fromTokenAccount = await getAssociatedTokenAddressSync(
       USDC_MINT,
-      smartWalletPubkey
+      smartWalletPubkey,
+      true,
     );
 
     // Recipient USDC ATA
