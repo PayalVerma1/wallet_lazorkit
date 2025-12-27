@@ -82,6 +82,7 @@ This example focuses purely on **authentication and wallet creation**, without t
 ## Example 02: Gasless USDC Transfer on Solana
 
 **Path:** `app/example-02-transfer`
+
 **[Example 02: Gasless USDC transfer](app/example-02-transfer/README.md)**
 
 
@@ -102,6 +103,7 @@ The transfer uses the **SPL Token Program**, which is the standard Solana protoc
 ## Example 03: Pay with Solana Widget
 
 **Path:** `app/example-03-pay-widget`
+
 **[Example 03: Pay Widget](app/example-02-pay-widget/README.md)**
 
 

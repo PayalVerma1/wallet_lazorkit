@@ -10,17 +10,17 @@ It builds directly on **Example 01**, where the smart wallet is created using pa
 
 ## What this example demonstrates
 
-* **USDC transfer** using the SPL Token program
+* **USDC transfer** using the SPL Token Program
 * **Gasless transactions** via Lazorkit paymaster
-* **Transaction signing with passkeys**
-* Interaction with a **real Solana protocol**
+* **Transaction signing with passkeys (WebAuthn)**
+* Interaction with a **real Solana protocol (SPL Token)**
 * No SOL balance required by the user
 
 ---
 
 ## Solana protocol used
 
-This example interacts with the **SPL Token Program**, which is the standard Solana protocol for fungible tokens like **USDC**.
+This example interacts with the **SPL Token Program**, the standard Solana protocol for fungible tokens like **USDC**.
 
 This satisfies the bounty requirement:
 
@@ -33,10 +33,12 @@ This satisfies the bounty requirement:
 1. User connects using passkey (Example 01)
 2. Smart wallet is restored or created
 3. User clicks **Send USDC (Gasless)**
-4. USDC transfer instruction is created
-5. Transaction is signed using Face ID / Touch ID
-6. Lazorkit paymaster covers the gas fee
-7. Transaction is submitted on-chain
+4. Associated Token Accounts (ATAs) are resolved
+5. Missing recipient ATA is created automatically (if needed)
+6. USDC transfer instruction is created
+7. Transaction is signed using Face ID / Touch ID
+8. Lazorkit paymaster covers the gas fee
+9. Transaction is submitted on-chain
 
 ---
 
@@ -55,15 +57,16 @@ With Lazorkit:
 
 ---
 
-## Minimal USDC Transfer Code (Copy-Paste)
+## Minimal Gasless USDC Transfer Code (Safe Version)
 
-This is the **minimal logic** required to send USDC gaslessly using Lazorkit.
+This is the **recommended minimal implementation**, including **automatic ATA creation** to prevent transaction failures.
 
 ```ts
 import { useWallet } from "@lazorkit/wallet";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import {
   getAssociatedTokenAddress,
+  createAssociatedTokenAccountInstruction,
   createTransferInstruction,
 } from "@solana/spl-token";
 
@@ -71,34 +74,53 @@ const USDC_MINT = new PublicKey(
   "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU" // Devnet USDC
 );
 
+const RECIPIENT = new PublicKey("RECEIVER_WALLET_ADDRESS");
+
 export function TransferButton() {
   const { smartWalletPubkey, signAndSendTransaction } = useWallet();
 
   const handleTransfer = async () => {
     if (!smartWalletPubkey) return;
 
-    const senderATA = await getAssociatedTokenAddress(
+    const amount = 1_000_000; // 1 USDC (6 decimals)
+    const instructions = [];
+
+    const fromATA = await getAssociatedTokenAddress(
       USDC_MINT,
-      smartWalletPubkey,
-      true
+      smartWalletPubkey
     );
 
-    const receiver = new PublicKey("RECEIVER_WALLET_ADDRESS");
-
-    const receiverATA = await getAssociatedTokenAddress(
+    const toATA = await getAssociatedTokenAddress(
       USDC_MINT,
-      receiver
+      RECIPIENT
     );
 
-    const instruction = createTransferInstruction(
-      senderATA,
-      receiverATA,
-      smartWalletPubkey,
-      1_000_000 // 1 USDC (6 decimals)
+    // Check if recipient ATA exists
+    const connection = new Connection("https://api.devnet.solana.com");
+    const toAccountInfo = await connection.getAccountInfo(toATA);
+
+    if (!toAccountInfo) {
+      instructions.push(
+        createAssociatedTokenAccountInstruction(
+          smartWalletPubkey, // payer (paymaster sponsors)
+          toATA,
+          RECIPIENT,
+          USDC_MINT
+        )
+      );
+    }
+
+    instructions.push(
+      createTransferInstruction(
+        fromATA,
+        toATA,
+        smartWalletPubkey,
+        amount
+      )
     );
 
     await signAndSendTransaction({
-      instructions: [instruction],
+      instructions,
       transactionOptions: {
         feeToken: "USDC",
       },
@@ -113,14 +135,30 @@ export function TransferButton() {
 
 ---
 
+## Why ATA handling matters
+
+On Solana:
+
+* Token transfers **require associated token accounts (ATAs)**
+* ATAs are **not created automatically**
+* Attempting to transfer to a missing ATA causes:
+
+  ```
+  InstructionError: InvalidAccountData
+  ```
+
+This example **safely checks and creates** the recipient ATA before transferring.
+
+---
+
 ## Key files in this example
 
-| File                 | Purpose                        |
-| -------------------- | ------------------------------ |
-| `TransferButton.tsx` | Builds and sends USDC transfer |
-| `ExampleLayout.tsx`  | Shared tutorial layout         |
-| `ConnectButton.tsx`  | Passkey wallet connection      |
-| `WalletInfo.tsx`     | Displays smart wallet address  |
+| File                 | Purpose                                |
+| -------------------- | -------------------------------------- |
+| `TransferButton.tsx` | Builds and sends gasless USDC transfer |
+| `ExampleLayout.tsx`  | Shared tutorial layout                 |
+| `ConnectButton.tsx`  | Passkey wallet connection              |
+| `WalletInfo.tsx`     | Displays smart wallet address          |
 
 ---
 
@@ -130,7 +168,7 @@ This example shows how developers can:
 
 * Remove **gas fees** from token transfers
 * Build payment flows without wallet extensions
-* Use real Solana protocols safely
+* Use **real Solana protocols safely**
 * Improve onboarding and retention
 
 It highlights a core Lazorkit value:
@@ -139,39 +177,33 @@ It highlights a core Lazorkit value:
 
 ---
 
-## Common issues
+## Common issues & solutions
 
-| Issue                   | Explanation                                                             |
-| ----------------------- | ----------------------------------------------------------------------- |
-| TokenOwnerOffCurveError | Smart wallets are PDA-like — pass `true` to `getAssociatedTokenAddress` |
-| No USDC balance         | Token account is created on first transfer                              |
-| Transaction fails       | Ensure Devnet USDC mint is correct                                      |
-| Popup blocked           | Allow popups for Lazorkit portal                                        |
+| Issue                    | Explanation                                             |
+| ------------------------ | ------------------------------------------------------- |
+| `InvalidAccountData`     | Recipient ATA does not exist — ensure ATA creation      |
+| `Account already in use` | ATA was created twice — check existence before creating |
+| No USDC balance          | Sender ATA exists but has 0 balance                     |
+| Wrong USDC mint          | Use **Devnet USDC mint** on Devnet                      |
+| Popup blocked            | Allow popups for Lazorkit portal                        |
+
+---
+
+## Testing on Devnet
+
+1. Create a wallet using Face ID / Touch ID
+2. Get devnet SOL from **Solana Faucet**
+3. Get devnet USDC from **Circle Faucet**
+4. Try the gasless USDC transfer
 
 ---
 
 ## Next steps
 
-Now that you understand **gasless token transfers**, explore:
+Continue with:
 
-* **Example 03: Pay with Solana Widget**
-  A product-style checkout abstraction built on top of gasless USDC transfers.
-
----
-
-## Live Demo
-
-Try this example live:
-
-**[https://wallet-lazorkit.vercel.app/example-02-transfer](https://wallet-lazorkit.vercel.app/example-02-transfer)**
-
----
-## Testing on Devnet:
-
-1. Create a wallet using Face ID/Touch ID
-2. Get devnet SOL from **Solana Faucet**
-3. Get devnet USDC from **Circle Faucet**
-4. Try the gasless transfer and subscription features
+**Example 03: Pay with Solana Widget**
+A product-style checkout abstraction built on top of gasless USDC transfers.
 
 ---
 
@@ -181,4 +213,3 @@ Try this example live:
 * **SPL Token Docs:** [https://spl.solana.com/token](https://spl.solana.com/token)
 * **Solana Web3.js:** [https://solana-labs.github.io/solana-web3.js](https://solana-labs.github.io/solana-web3.js)
 
----

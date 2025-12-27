@@ -4,12 +4,12 @@ import { useWallet } from "@lazorkit/wallet";
 import {
   getAssociatedTokenAddress,
   createTransferInstruction,
-  getAssociatedTokenAddressSync,
+  createAssociatedTokenAccountInstruction,
 } from "@solana/spl-token";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 
 const USDC_MINT = new PublicKey(
-  "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+  "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU" // Devnet USDC
 );
 
 const RECIPIENT = new PublicKey(
@@ -22,35 +22,48 @@ export function TransferButton() {
   const handleTransfer = async () => {
     if (!smartWalletPubkey) return;
 
-    // 1 USDC = 1_000_000 (6 decimals)
-    const amount = 1_000_000;
+    const amount = 1_000_000; // 1 USDC
+    const instructions = [];
 
-    // Sender USDC ATA
-    const fromTokenAccount = await getAssociatedTokenAddressSync(
+    const fromATA = await getAssociatedTokenAddress(
       USDC_MINT,
-      smartWalletPubkey,
-      true,
+      smartWalletPubkey
     );
 
-    // Recipient USDC ATA
-    const toTokenAccount = await getAssociatedTokenAddress(
+    const toATA = await getAssociatedTokenAddress(
       USDC_MINT,
       RECIPIENT
     );
 
-    // Create USDC transfer instruction
-    const instruction = createTransferInstruction(
-      fromTokenAccount,
-      toTokenAccount,
-      smartWalletPubkey,
-      amount
+    //  Check if recipient ATA exists
+    const connection = new Connection("https://api.devnet.solana.com");
+    const toAccountInfo = await connection.getAccountInfo(toATA);
+
+    if (!toAccountInfo) {
+      instructions.push(
+        createAssociatedTokenAccountInstruction(
+          smartWalletPubkey,
+          toATA,
+          RECIPIENT,
+          USDC_MINT
+        )
+      );
+    }
+
+    // Transfer
+    instructions.push(
+      createTransferInstruction(
+        fromATA,
+        toATA,
+        smartWalletPubkey,
+        amount
+      )
     );
 
-    // Gasless send
     await signAndSendTransaction({
-      instructions: [instruction],
+      instructions,
       transactionOptions: {
-        feeToken: "USDC", // pay gas in USDC
+        feeToken: "USDC",
       },
     });
 
@@ -58,14 +71,12 @@ export function TransferButton() {
   };
 
   return (
-    <button onClick={handleTransfer} className="px-6 py-3 rounded-lg
-    border border-orange-400
-    text-orange-400 font-medium
-    transition
-    hover:bg-orange-400 hover:text-black
-    disabled:opacity-40 disabled:cursor-not-allowed
-    disabled:hover:bg-transparent disabled:hover:text-orange-400
-  ">
+    <button
+      onClick={handleTransfer}
+      className="px-6 py-3 rounded-lg border border-orange-400
+      text-orange-400 font-medium transition
+      hover:bg-orange-400 hover:text-black"
+    >
       Send 1 USDC (Gasless)
     </button>
   );
