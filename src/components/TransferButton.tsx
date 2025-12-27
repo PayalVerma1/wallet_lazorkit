@@ -27,7 +27,8 @@ export function TransferButton() {
 
     const fromATA = await getAssociatedTokenAddress(
       USDC_MINT,
-      smartWalletPubkey
+      smartWalletPubkey,
+      true,
     );
 
     const toATA = await getAssociatedTokenAddress(

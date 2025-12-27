@@ -77,8 +77,8 @@ export default function Example01Login() {
       }
     >
       <div className="flex flex-col items-center gap-4">
+         <WalletInfo />
         <ConnectButton />
-        <WalletInfo />
       </div>
     </ExampleLayout>
   );
