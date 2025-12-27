@@ -36,7 +36,7 @@ export function PayWithSolanaButton() {
     disabled:opacity-40 disabled:cursor-not-allowed
     disabled:hover:bg-transparent disabled:hover:text-orange-400
   ">
-      Pay ₹99 with Solana
+      Pay with Solana
     </button>
   );
 }
