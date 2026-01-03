@@ -14,9 +14,14 @@ export default function HomePage() {
 
           <p className="text-gray-400 max-w-2xl mx-auto">
             A practical, developer-focused collection of examples showing how to
-            build Solana applications using <span className="text-[#2dd4bf] font-medium">passkeys</span>,
-            <span className="text-[#2dd4bf] font-medium"> smart wallets</span>, and
-            <span className="text-[#2dd4bf] font-medium"> gasless transactions</span>{" "}
+            build Solana applications using{" "}
+            <span className="text-[#2dd4bf] font-medium">passkeys</span>,
+            <span className="text-[#2dd4bf] font-medium"> smart wallets</span>,
+            and
+            <span className="text-[#2dd4bf] font-medium">
+              {" "}
+              gasless transactions
+            </span>{" "}
             with Lazorkit — without browser wallets or seed phrases.
           </p>
         </div>
@@ -26,10 +31,11 @@ export default function HomePage() {
           <h2 className="text-xl font-semibold">What is Lazorkit?</h2>
           <p className="text-gray-400">
             Lazorkit is a Solana SDK that enables developers to build Web2-like
-            user experiences using <span className="text-[#2dd4bf]">passkey authentication</span>.
+            user experiences using{" "}
+            <span className="text-[#2dd4bf]">passkey authentication</span>.
             Users can sign in with Face ID / Touch ID and interact with Solana
-            through <span className="text-[#2dd4bf]">smart wallets</span>, without
-            installing any wallet extensions.
+            through <span className="text-[#2dd4bf]">smart wallets</span>,
+            without installing any wallet extensions.
           </p>
         </div>
 
@@ -60,8 +66,8 @@ export default function HomePage() {
                   Example 02: Gasless USDC Transfer
                 </h3>
                 <p className="text-sm text-gray-400 mt-1">
-                  Send USDC on Solana using a smart wallet, with transaction fees
-                  sponsored by a paymaster. Users do not need SOL.
+                  Send USDC on Solana using a smart wallet, with transaction
+                  fees sponsored by a paymaster. Users do not need SOL.
                 </p>
               </div>
             </Link>
@@ -75,6 +81,33 @@ export default function HomePage() {
                 <p className="text-sm text-gray-400 mt-1">
                   A checkout-style payment flow that abstracts blockchain
                   complexity and enables one-click Solana payments.
+                </p>
+              </div>
+            </Link>
+            {/* Example 04 */}
+            <Link href="/example-04-tokenswap">
+              <div className="group border border-white/15 rounded-lg p-5 text-orange-300 cursor-pointer transition hover:border-[#2dd4bf]">
+                <h3 className="text-lg font-medium group-hover:text-[#2dd4bf]">
+                  Example 04: Basic Token Swap Interface
+                </h3>
+                <p className="text-sm text-gray-400 mt-1">
+                  Demonstrates how Lazorkit smart wallets can sign
+                  multi-instruction transactions for DEX-style token swaps
+                  without browser wallets.
+                </p>
+              </div>
+            </Link>
+
+            {/* Example 05 */}
+            <Link href="/example-05-subscription">
+              <div className="group border border-white/15 rounded-lg p-5 text-orange-300 cursor-pointer transition hover:border-[#2dd4bf]">
+                <h3 className="text-lg font-medium group-hover:text-[#2dd4bf]">
+                  Example 05: Subscription Service (USDC Billing)
+                </h3>
+                <p className="text-sm text-gray-400 mt-1">
+                  A subscription-style payment flow showing recurring USDC
+                  billing powered by passkey-based smart wallets and gasless
+                  transactions.
                 </p>
               </div>
             </Link>
