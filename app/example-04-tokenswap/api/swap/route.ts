@@ -14,7 +14,7 @@ export async function POST(req: Request) {
       );
     }
 
-    
+    //  Fetch quote
     const quoteRes = await fetch(
       `${JUPITER_QUOTE_API}?inputMint=${inMint}&outputMint=${outMint}&amount=${amount}&slippageBps=50`
     );
@@ -25,13 +25,22 @@ export async function POST(req: Request) {
 
     const quote = await quoteRes.json();
 
+    if (!quote.data || quote.data.length === 0) {
+      throw new Error("No swap routes available");
+    }
+
+    // Pick best route
+    const bestRoute = quote.data[0];
+
+    // Fetch swap instructions
     const swapRes = await fetch(JUPITER_SWAP_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        quoteResponse: quote,
+        quoteResponse: bestRoute,
         userPublicKey: user,
         wrapAndUnwrapSol: true,
+        dynamicComputeUnitLimit: true,
       }),
     });
 
@@ -41,15 +50,14 @@ export async function POST(req: Request) {
 
     const swap = await swapRes.json();
 
+    // Return ONLY instructions (no signing)
     return NextResponse.json({
-      instructions: swap.swapTransaction
-        ? swap.instructions // newer format
-        : swap.instructions || [],
+      instructions: swap.instructions,
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Jupiter swap-route error:", err);
     return NextResponse.json(
-      { error: err?.message || "Swap route failed" },
+      { error: err instanceof Error ? err.message : "Swap route failed" },
       { status: 500 }
     );
   }

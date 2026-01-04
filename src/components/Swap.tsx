@@ -1,59 +1,76 @@
 "use client";
 
 import { useWallet } from "@lazorkit/wallet";
-import { PublicKey, TransactionInstruction } from "@solana/web3.js";
-import { Buffer } from "buffer";
+import {
+  PublicKey,
+  TransactionInstruction,
+  AccountMeta,
+} from "@solana/web3.js";
+
+type JupiterInstruction = {
+  programId: string;
+  keys: {
+    pubkey: string;
+    isSigner: boolean;
+    isWritable: boolean;
+  }[];
+  data: string; // base64
+};
+
+type SwapRouteResponse = {
+  instructions: JupiterInstruction[];
+};
 
 export default function Swap() {
   const { smartWalletPubkey, isConnected, signAndSendTransaction } = useWallet();
 
-  function b64ToU8(b64: string) {
-    return Buffer.from(b64, "base64");
+  function base64ToBuffer(data: string): Buffer {
+    return Buffer.from(data, "base64");
   }
 
-  async function handleSwap() {
+  async function swap(): Promise<void> {
     if (!isConnected || !smartWalletPubkey) return;
 
-    // Ask backend / Jupiter for swap instructions
-    const res = await fetch("/api/swap-route", {
+  const res = await fetch("/example-04-tokenswap/api/swap", {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        inMint: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v", // USDC
+        inMint: "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU", // USDC (devnet)
         outMint: "So11111111111111111111111111111111111111112", // SOL
-        amount: 5_000_000, // 5 USDC
+        amount: 1_000_000,
         user: smartWalletPubkey.toBase58(),
       }),
     });
 
-    if (!res.ok) throw new Error("Failed to get swap route");
+    if (!res.ok) {
+      throw new Error("Failed to fetch swap route");
+    }
 
-    const { instructions } = await res.json();
+    const { instructions }: SwapRouteResponse = await res.json();
 
-    // Rebuild instructions
-    const ixs = instructions.map(
-      (ix: any) =>
+    const txInstructions: TransactionInstruction[] = instructions.map(
+      (ix): TransactionInstruction =>
         new TransactionInstruction({
           programId: new PublicKey(ix.programId),
-          keys: ix.keys.map((k: any) => ({
-            pubkey: new PublicKey(k.pubkey),
-            isSigner: k.isSigner,
-            isWritable: k.isWritable,
-          })),
-          data: b64ToU8(ix.data),
+          keys: ix.keys.map(
+            (k): AccountMeta => ({
+              pubkey: new PublicKey(k.pubkey),
+              isSigner: k.isSigner,
+              isWritable: k.isWritable,
+            })
+          ),
+          data: base64ToBuffer(ix.data), // ✅ Buffer, not Uint8Array
         })
     );
 
-    // Lazorkit signs & sends (gasless)
     await signAndSendTransaction({
-      instructions: ixs,
-      transactionOptions: { feeToken: "USDC" },
+      instructions: txInstructions,
     });
   }
 
   return (
     <button
-      onClick={handleSwap}
+      onClick={swap}
       disabled={!isConnected}
       className="px-6 py-3 rounded-lg border border-orange-400 text-orange-400 hover:bg-orange-400 hover:text-black"
     >

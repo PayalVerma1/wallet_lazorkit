@@ -1,17 +1,13 @@
 "use client";
-
 import { ExampleLayout } from "@/src/components/ExampleLayout";
 import { ConnectButton } from "@/src/components/ConnectButton";
 import { WalletInfo } from "@/src/components/WalletInfo";
 import { CodeBlock } from "@/src/components/CodeBlock";
 import { useWallet } from "@lazorkit/wallet";
 import Subscription from "@/src/components/subscription";
-import { PublicKey } from "@solana/web3.js";
-import { createTransferInstruction } from "@solana/spl-token";
-
 const SUBSCRIPTION_CODE = `import { useWallet } from "@lazorkit/wallet";
-import { createTransferInstruction } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
+import { createTransferInstruction } from "@solana/spl-token";
 
 const MERCHANT = new PublicKey("MERCHANT_WALLET_ADDRESS");
 
@@ -21,21 +17,24 @@ export function SubscribeButton() {
   async function subscribe() {
     if (!smartWalletPubkey) return;
 
-    const instruction = createTransferInstruction(
+    // Build a USDC payment instruction (represents one billing cycle)
+    const ix = createTransferInstruction(
+      smartWalletPubkey, // payer (simplified for example)
+      MERCHANT,          // subscription owner
       smartWalletPubkey,
-      MERCHANT,
-      smartWalletPubkey,
-      5_000_000 // 5 USDC (6 decimals)
+      5_000_000          // 5 USDC (6 decimals)
     );
 
+    // Lazorkit signs & sends using passkeys (no wallet extensions)
     await signAndSendTransaction({
-      instructions: [instruction],
+      instructions: [ix],
       transactionOptions: { feeToken: "USDC" },
     });
   }
 
   return <button onClick={subscribe}>Subscribe – 5 USDC / month</button>;
-}`;
+}
+`;
 
 export default function Example05Subscription() {
   const { isConnected } = useWallet();
@@ -68,7 +67,8 @@ export default function Example05Subscription() {
         <>
           <h2 className="text-xl font-semibold">Code Example</h2>
           <p className="text-sm text-white/60 max-w-2xl">
-            Minimal subscription-style USDC billing using Lazorkit smart wallets.
+            Minimal subscription-style USDC billing using Lazorkit smart
+            wallets.
           </p>
           <div className="border border-white/15 rounded-lg p-4">
             <CodeBlock code={SUBSCRIPTION_CODE} />
@@ -78,15 +78,15 @@ export default function Example05Subscription() {
     >
       <div className="flex flex-col items-center gap-4">
         <div className="flex flex-col items-center gap-4">
-               {!isConnected && <ConnectButton />}
-       
-               {isConnected && (
-                 <>
-                   <WalletInfo />
-                    <Subscription />
-                 </>
-               )}
-             </div>
+          {!isConnected && <ConnectButton />}
+
+          {isConnected && (
+            <>
+              <WalletInfo />
+              <Subscription />
+            </>
+          )}
+        </div>
       </div>
     </ExampleLayout>
   );

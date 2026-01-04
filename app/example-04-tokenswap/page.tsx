@@ -7,11 +7,7 @@ import { CodeBlock } from "@/src/components/CodeBlock";
 import { useWallet } from "@lazorkit/wallet";
 import Swap from "@/src/components/Swap";
 const SWAP_CODE = `import { useWallet } from "@lazorkit/wallet";
-import { PublicKey } from "@solana/web3.js";
-import { getAssociatedTokenAddress, createTransferInstruction } from "@solana/spl-token";
-
-const USDC = new PublicKey("EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v");
-const MERCHANT = new PublicKey("EEE2dZ4EHFHmgG24zKgVUutCXQqtYTLJCEAWoNcNAXTj");
+import { PublicKey, TransactionInstruction } from "@solana/web3.js";
 
 export function Swap() {
   const { smartWalletPubkey, signAndSendTransaction } = useWallet();
@@ -19,19 +15,34 @@ export function Swap() {
   async function swap() {
     if (!smartWalletPubkey) return;
 
-    const from = await getAssociatedTokenAddress(USDC, smartWalletPubkey, true);
-    const to = await getAssociatedTokenAddress(USDC, MERCHANT, true);
-
-    const ix = createTransferInstruction(from, to, smartWalletPubkey, 5_000_000);
-
-    await signAndSendTransaction({
-      instructions: [ix],
-      transactionOptions: { feeToken: "USDC" },
+    const res = await fetch("/api/jupiter/swap-route", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        inMint: "USDC_MINT",
+        outMint: "SOL_MINT",
+        amount: 1_000_000,
+        user: smartWalletPubkey.toBase58(),
+      }),
     });
+
+    const { instructions } = await res.json();
+
+    const txInstructions = instructions.map(
+      (ix: any) =>
+        new TransactionInstruction({
+          programId: new PublicKey(ix.programId),
+          keys: ix.keys,
+          data: Buffer.from(ix.data, "base64"),
+        })
+    );
+
+    await signAndSendTransaction({ instructions: txInstructions });
   }
 
   return <button onClick={swap}>Swap USDC → SOL</button>;
-}`;
+}
+`;
 
 
 export default function Example04TokenSwap() {
