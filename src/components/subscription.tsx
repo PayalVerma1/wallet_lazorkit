@@ -29,7 +29,7 @@ export default function Subscription() {
       fromATA,
       toATA,
       smartWalletPubkey,
-      5_000_000
+      1_000_000
     );
 
     await signAndSendTransaction({
@@ -61,7 +61,7 @@ export default function Subscription() {
   "
       disabled={!isConnected}
     >
-      Authorize $5/month subscription
+      Authorize $1/month subscription
     </button>
   );
 }
