@@ -4,7 +4,7 @@ import Image from "next/image";
 import {CodeBlock} from "@/src/components/CodeBlock";
 import { ExampleLayout } from "@/src/components/ExampleLayout";
 import { ConnectButton } from "@/src/components/ConnectButton";
-import { PayWithSolanaButton } from "@/src/components/PayWithSolanaButton";
+import PayWithSolanaButton from "@/src/components/PayWithSolanaButton";
 import { WalletInfo } from "@/src/components/WalletInfo";
 import { useWallet } from "@lazorkit/wallet";
 const TRANSFER_CODE = `import { useWallet } from "@lazorkit/wallet";
