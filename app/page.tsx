@@ -84,25 +84,12 @@ export default function HomePage() {
                 </p>
               </div>
             </Link>
-            {/* Example 04 */}
-            <Link href="/example-04-tokenswap">
-              <div className="group border border-white/15 rounded-lg p-5 text-orange-300 cursor-pointer transition hover:border-[#2dd4bf]">
-                <h3 className="text-lg font-medium group-hover:text-[#2dd4bf]">
-                  Example 04: Basic Token Swap Interface
-                </h3>
-                <p className="text-sm text-gray-400 mt-1">
-                  Demonstrates how Lazorkit smart wallets can sign
-                  multi-instruction transactions for DEX-style token swaps
-                  without browser wallets.
-                </p>
-              </div>
-            </Link>
-
+           
             {/* Example 05 */}
             <Link href="/example-05-subscription">
               <div className="group border border-white/15 rounded-lg p-5 text-orange-300 cursor-pointer transition hover:border-[#2dd4bf]">
                 <h3 className="text-lg font-medium group-hover:text-[#2dd4bf]">
-                  Example 05: Subscription Service (USDC Billing)
+                  Example 04: Subscription Service (USDC Billing)
                 </h3>
                 <p className="text-sm text-gray-400 mt-1">
                   A subscription-style payment flow showing recurring USDC

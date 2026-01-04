@@ -41,7 +41,7 @@ export default function Example05Subscription() {
 
   return (
     <ExampleLayout
-      title="Example 05: Subscription Service with USDC Billing"
+      title="Example 04: Subscription Service with USDC Billing"
       description="This example shows how Lazorkit smart wallets can power subscription-style payments using USDC, without requiring users to manage gas or private keys."
       learnPoints={[
         "Authorizing payments using passkeys",
