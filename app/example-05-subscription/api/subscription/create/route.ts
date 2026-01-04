@@ -6,7 +6,7 @@ export async function POST(req: Request) {
 
   subscriptions.push({
     smartWallet: body.smartWallet,
-    amount: 5_000_000,
+    amount: 1_000_000,
     nextChargeAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
     active: true,
   });

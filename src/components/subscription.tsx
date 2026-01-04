@@ -39,7 +39,7 @@ export default function Subscription() {
       },
     });
     // Save subscription on backend
-    await fetch("/api/subscription/create", {
+    await fetch("app/example-05-subscription/api/subscription/create", {
       method: "POST",
       body: JSON.stringify({
         smartWallet: smartWalletPubkey.toBase58(),
