@@ -1,30 +1,40 @@
 "use client";
 
+import { useState } from "react";
 import { useWallet } from "@lazorkit/wallet";
 import { SystemProgram, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
-export function PayWithSolanaButton() {
+export default function PayWithSolanaButton() {
   const { signAndSendTransaction, smartWalletPubkey } = useWallet();
+  const [payLoading, setPayLoading] = useState(false);
 
   const handlePay = async () => {
     if (!smartWalletPubkey) return;
+    setPayLoading(true);
 
-    const instruction = SystemProgram.transfer({
-      fromPubkey: smartWalletPubkey,
-      toPubkey: new PublicKey(
-        "EEE2dZ4EHFHmgG24zKgVUutCXQqtYTLJCEAWoNcNAXTj"
-      ),
-      lamports: Math.floor(0.05 * LAMPORTS_PER_SOL),
-    });
+    try {
+      const instruction = SystemProgram.transfer({
+        fromPubkey: smartWalletPubkey,
+        toPubkey: new PublicKey(
+          "EEE2dZ4EHFHmgG24zKgVUutCXQqtYTLJCEAWoNcNAXTj"
+        ),
+        lamports: Math.floor(0.05 * LAMPORTS_PER_SOL),
+      });
 
-    await signAndSendTransaction({
-      instructions: [instruction],
-      transactionOptions: {
-        feeToken: "USDC",
-      },
-    });
+      await signAndSendTransaction({
+        instructions: [instruction],
+        transactionOptions: {
+          feeToken: "USDC",
+        },
+      });
 
-    alert("Payment successful!");
+      alert("Payment successful!");
+    } catch (err) {
+      console.error(err);
+      alert("Payment failed");
+    } finally {
+      setPayLoading(false);
+    }
   };
 
   return (
@@ -36,7 +46,7 @@ export function PayWithSolanaButton() {
     disabled:opacity-40 disabled:cursor-not-allowed
     disabled:hover:bg-transparent disabled:hover:text-orange-400
   ">
-      Pay with Solana
+    {payLoading ? "Processing..." : "Pay with Solana"}
     </button>
   );
 }

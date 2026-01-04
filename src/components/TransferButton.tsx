@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useWallet } from "@lazorkit/wallet";
 import {
   getAssociatedTokenAddress,
@@ -18,67 +19,77 @@ const RECIPIENT = new PublicKey(
 
 export function TransferButton() {
   const { smartWalletPubkey, signAndSendTransaction } = useWallet();
+  const [transferLoading, setTransferLoading] = useState(false);
 
   const handleTransfer = async () => {
     if (!smartWalletPubkey) return;
 
-    const amount = 1_000_000; // 1 USDC
-    const instructions = [];
+    setTransferLoading(true);
+    try {
+      const amount = 1_000_000; // 1 USDC
+      const instructions: any[] = [];
 
-    const fromATA = await getAssociatedTokenAddress(
-      USDC_MINT,
-      smartWalletPubkey,
-      true,
-    );
+      const fromATA = await getAssociatedTokenAddress(
+        USDC_MINT,
+        smartWalletPubkey,
+        true,
+      );
 
-    const toATA = await getAssociatedTokenAddress(
-      USDC_MINT,
-      RECIPIENT
-    );
+      const toATA = await getAssociatedTokenAddress(
+        USDC_MINT,
+        RECIPIENT
+      );
 
-    //  Check if recipient ATA exists
-    const connection = new Connection("https://api.devnet.solana.com");
-    const toAccountInfo = await connection.getAccountInfo(toATA);
+      //  Check if recipient ATA exists
+      const connection = new Connection("https://api.devnet.solana.com");
+      const toAccountInfo = await connection.getAccountInfo(toATA);
 
-    if (!toAccountInfo) {
+      if (!toAccountInfo) {
+        instructions.push(
+          createAssociatedTokenAccountInstruction(
+            smartWalletPubkey,
+            toATA,
+            RECIPIENT,
+            USDC_MINT
+          )
+        );
+      }
+
+      // Transfer
       instructions.push(
-        createAssociatedTokenAccountInstruction(
-          smartWalletPubkey,
+        createTransferInstruction(
+          fromATA,
           toATA,
-          RECIPIENT,
-          USDC_MINT
+          smartWalletPubkey,
+          amount
         )
       );
+
+      await signAndSendTransaction({
+        instructions,
+        transactionOptions: {
+          feeToken: "USDC",
+        },
+      });
+
+      alert("USDC transfer successful!");
+    } catch (err) {
+      console.error("Transfer failed", err);
+      alert("USDC transfer failed");
+    } finally {
+      setTransferLoading(false);
     }
-
-    // Transfer
-    instructions.push(
-      createTransferInstruction(
-        fromATA,
-        toATA,
-        smartWalletPubkey,
-        amount
-      )
-    );
-
-    await signAndSendTransaction({
-      instructions,
-      transactionOptions: {
-        feeToken: "USDC",
-      },
-    });
-
-    alert("USDC transfer successful!");
   };
 
   return (
     <button
       onClick={handleTransfer}
+      disabled={transferLoading}
       className="px-6 py-3 rounded-lg border border-orange-400
       text-orange-400 font-medium transition
       hover:bg-orange-400 hover:text-black"
     >
-      Send 1 USDC (Gasless)
+     {transferLoading ? "Sending..." : "Send 1 USDC (Gasless)"}
     </button>
   );
 }
