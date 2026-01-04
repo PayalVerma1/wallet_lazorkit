@@ -31,7 +31,7 @@ export default function Swap() {
   async function swap(): Promise<void> {
     if (!isConnected || !smartWalletPubkey) return;
 
-  const res = await fetch("/example-04-tokenswap/api/swap", {
+  const res = await fetch("/api/swap", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
