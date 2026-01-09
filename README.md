@@ -302,4 +302,7 @@ The focus is on:
 
 Feel free to fork, extend, or adapt these examples for your own Solana projects.
 
+### 🎥 Demo Video
+[Watch the demo](public/Images/video.mp4)
+
 ---
